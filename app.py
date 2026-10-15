@@ -36,10 +36,21 @@ class Audit(Base):
 async def lifespan(app):
  Base.metadata.create_all(engine)
  with DB() as db:
-  if not db.query(User).first():
-   email=os.getenv('OWNER_EMAIL');password=os.getenv('OWNER_PASSWORD')
-   if email and password and len(password)>=12:
-    db.add(User(name='مالك نوا',email=email.lower().strip(),password_hash=crypt.hash(password),role='owner'));db.commit()
+  # OWNER_EMAIL / OWNER_PASSWORD are the source of truth for owner login.
+  # Update existing owner credentials when Railway variables change.
+  email=(os.getenv('OWNER_EMAIL') or '').strip().lower()
+  password=os.getenv('OWNER_PASSWORD') or ''
+  if email and password:
+   owner=db.query(User).filter(User.role=='owner').order_by(User.id).first()
+   if owner is None:
+    owner=User(name='مالك نوا',email=email,password_hash=crypt.hash(password),role='owner',active=1)
+    db.add(owner)
+   else:
+    owner.email=email
+    owner.active=1
+    if not crypt.verify(password,owner.password_hash):
+     owner.password_hash=crypt.hash(password)
+   db.commit()
  yield
 if os.getenv('RAILWAY_ENVIRONMENT') and (not os.getenv('SESSION_SECRET') or len(os.getenv('SESSION_SECRET','')) < 32):
  raise RuntimeError('Set a strong SESSION_SECRET of at least 32 characters in Railway variables')

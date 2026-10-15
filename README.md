@@ -40,3 +40,10 @@ Revenue currently counts **delivered** orders; costs and profit are preliminary 
 
 ## Recommended mobile testing
 Test at 320px, 375px, 390px, 430px widths and 768px tablet, plus desktop. Test Safari iOS and Chrome Android, form keyboard behavior, RTL, horizontal scrolling, and access controls.
+
+## إصلاح تسجيل دخول المالك (v0.3)
+- عند تشغيل التطبيق تتم مزامنة حساب المالك الموجود مع `OWNER_EMAIL` و `OWNER_PASSWORD` من Railway، حتى لو كان الحساب قد أُنشئ مسبقاً.
+- لا تُخزَّن بيانات الدخول في الكود أو ملف ZIP.
+- اضبط `OWNER_EMAIL` و `OWNER_PASSWORD` داخل Railway Variables، ثم انشر النسخة الجديدة.
+- استخدم كلمة مرور طويلة وفريدة بعد اختبار الدخول، ولا تعرض قيمتها في الصور.
+- إذا ظهر تعارض بريد إلكتروني مع حساب آخر، يلزم فحص قاعدة البيانات قبل تعديل الحسابات.
